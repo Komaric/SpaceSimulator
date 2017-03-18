@@ -12,7 +12,7 @@ public class Spaceship extends MovableSpaceObject {
         if (acceleration == null) {
             throw new IllegalArgumentException("\"acceleration\" can't be null");
         }
-        this.acceleration = acceleration;
+        this.acceleration = acceleration.normalize();
     }
 
     @Override
@@ -25,6 +25,6 @@ public class Spaceship extends MovableSpaceObject {
     }
 
     public void setAcceleration(Vector acceleration) {
-        this.acceleration = acceleration;
+        this.acceleration = acceleration.normalize();
     }
 }

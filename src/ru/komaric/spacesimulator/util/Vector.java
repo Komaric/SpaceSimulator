@@ -29,9 +29,9 @@ public class Vector {
         return value;
     }
 
-    public Vector normalize(Vector vector) {
-        double x = vector.direction.getX();
-        double y = vector.direction.getY();
+    public Vector normalize() {
+        double x = this.direction.getX();
+        double y = this.direction.getY();
         double length = Math.sqrt(x * x + y * y);
         Point direction = new Point(x / length, y / length);
         return new Vector(direction, this.value);
