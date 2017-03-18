@@ -14,5 +14,9 @@ public abstract class MovableSpaceObject extends SpaceObject {
         }
         this.speed = speed;
     }
+
+    public Vector getSpeed() {
+        return speed;
+    }
 }
 
