@@ -28,16 +28,38 @@ public abstract class SpaceObject {
         return name;
     }
 
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("\"name\" can't be null or empty");
+        }
+        this.name = name;
+    }
+
     public Point getCoordinates() {
         return coordinates;
+    }
+
+    public void setCoordinates(Point coordinates) {
+        if (coordinates == null) {
+            throw new IllegalArgumentException("\"coordinates\" can't be null");
+        }
+        this.coordinates = coordinates;
     }
 
     public double getWeight() {
         return weight;
     }
 
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
     public double getRadius() {
         return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
 
     public double distance(SpaceObject spaceObject) {

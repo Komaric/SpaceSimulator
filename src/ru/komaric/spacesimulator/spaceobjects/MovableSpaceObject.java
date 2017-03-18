@@ -18,5 +18,12 @@ public abstract class MovableSpaceObject extends SpaceObject {
     public Vector getSpeed() {
         return speed;
     }
+
+    public void setSpeed(Vector speed) {
+        if (speed == null) {
+            throw new IllegalArgumentException("\"speed\" can't be null");
+        }
+        this.speed = speed;
+    }
 }
 
