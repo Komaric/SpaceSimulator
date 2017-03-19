@@ -10,14 +10,6 @@ public class Point {
         this.y = y;
     }
 
-    public Point(Point point) {
-        if (point == null) {
-            throw new IllegalArgumentException("\"point\" can't be null");
-        }
-        this.x = point.x;
-        this.y = point.y;
-    }
-
     public double getX() {
         return x;
     }

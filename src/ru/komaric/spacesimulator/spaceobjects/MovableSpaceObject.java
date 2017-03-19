@@ -12,7 +12,7 @@ public abstract class MovableSpaceObject extends SpaceObject {
         if (speed == null) {
             throw new IllegalArgumentException("\"speed\" can't be null");
         }
-        this.speed = speed.normalize();
+        this.speed = speed;
     }
 
     public Vector getSpeed() {
@@ -23,7 +23,7 @@ public abstract class MovableSpaceObject extends SpaceObject {
         if (speed == null) {
             throw new IllegalArgumentException("\"speed\" can't be null");
         }
-        this.speed = speed.normalize();
+        this.speed = speed;
     }
 }
 
