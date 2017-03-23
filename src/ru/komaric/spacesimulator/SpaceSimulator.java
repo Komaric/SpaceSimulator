@@ -28,20 +28,31 @@ public class SpaceSimulator {
             throw new IllegalArgumentException("\"spaceObjects\" can't be null");
         }
         //Копируем, чтобы случайно их не изменить вовне
-        spaceObjects.forEach((name, object) -> this.spaceObjects.put(name, object.copy()));
+        spaceObjects.forEach((name, object) -> {
+            if (object == null) {
+                throw new IllegalArgumentException("\"spaceObjects\" can't contain null");
+            }
+            this.spaceObjects.put(name, object.copy());
+        });
     }
 
 
     public void addSpaceObject(String name, SpaceObject spaceObject) {
-        throw new NotImplementedException();
+        if (name == null) {
+            throw new IllegalArgumentException("\"name\" can't be null");
+        }
+        if (spaceObject == null) {
+            throw new IllegalArgumentException("\"spaceObject\" can't be null");
+        }
+        spaceObjects.put(name, spaceObject);
     }
 
     public void removeSpaceObject(String name) {
-        throw new NotImplementedException();
+        spaceObjects.remove(name);
     }
 
     public void getSpaceObject(String name) {
-        throw new NotImplementedException();
+        spaceObjects.get(name);
     }
 
     public void pause() {
