@@ -8,6 +8,8 @@ public class Vector {
     private double y;
     private double length;
 
+    public final static Vector Zero = new Vector(0, 0, 0);
+
     public Vector(double x, double y) {
         if (x == 0 && y == 0) {
             this.length = 0;
@@ -57,17 +59,25 @@ public class Vector {
                 + vector.length * vector.length
                 + 2 * this.length * vector.length * this.cosOfAngel(vector));
         if (length == 0) {
-            return new Vector(0, 0, 0);
+            return Zero;
         }
         double x = (this.length * this.x + vector.length * vector.x) / length;
         double y = (this.length * this.y + vector.length * vector.y) / length;
         return new Vector(x, y, length);
     }
 
+    public Vector sub(Vector vector) {
+        return this.add(vector.multiply(-1));
+    }
+
     public Vector multiply(double k) {
         return k == 0
-                ? new Vector(0, 0, 0)
+                ? Zero
                 : new Vector(x, y, k * length);
+    }
+
+    public Vector divide(double k) {
+        return this.multiply(1 / k);
     }
 
     public double dotProduct(Vector vector) {

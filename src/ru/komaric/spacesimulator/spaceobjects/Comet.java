@@ -1,17 +1,16 @@
 package ru.komaric.spacesimulator.spaceobjects;
 
-import ru.komaric.spacesimulator.util.Point;
 import ru.komaric.spacesimulator.util.Vector;
 
-public class Comet extends MovableSpaceObject implements Destroyable {
+public class Comet extends MovableSpaceObject implements Fadable {
 
-    public Comet(String name, Point coordinates, double weight, double radius, Vector speed) {
-        super(name, coordinates, weight, radius, speed);
+    public Comet(String name, Vector radiusVector, double weight, double radius, Vector speed) {
+        super(name, radiusVector, weight, radius, speed);
     }
 
     @Override
     public SpaceObject copy() {
-        return new Comet(name, coordinates, weight, radius, speed);
+        return new Comet(name, radiusVector, weight, radius, speed);
     }
 
     @Override

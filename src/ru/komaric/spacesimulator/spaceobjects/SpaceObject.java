@@ -1,23 +1,23 @@
 package ru.komaric.spacesimulator.spaceobjects;
 
-import ru.komaric.spacesimulator.util.Point;
+import ru.komaric.spacesimulator.util.Vector;
 
 public abstract class SpaceObject {
 
     protected String name;
-    protected Point coordinates;
+    protected Vector radiusVector;
     protected double weight;
     protected double radius;
 
-    public SpaceObject(String name, Point coordinates, double weight, double radius) {
+    public SpaceObject(String name, Vector radiusVector, double weight, double radius) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("\"name\" can't be null or empty");
         }
-        if (coordinates == null) {
-            throw new IllegalArgumentException("\"coordinates\" can't be null");
+        if (radiusVector == null) {
+            throw new IllegalArgumentException("\"radiusVector\" can't be null");
         }
         this.name = name;
-        this.coordinates = coordinates;
+        this.radiusVector = radiusVector;
         this.weight = weight;
         this.radius = radius;
     }
@@ -35,15 +35,15 @@ public abstract class SpaceObject {
         this.name = name;
     }
 
-    public Point getCoordinates() {
-        return coordinates;
+    public Vector getRadiusVector() {
+        return radiusVector;
     }
 
-    public void setCoordinates(Point coordinates) {
-        if (coordinates == null) {
-            throw new IllegalArgumentException("\"coordinates\" can't be null");
+    public void setRadiusVector(Vector radiusVector) {
+        if (radiusVector == null) {
+            throw new IllegalArgumentException("\"radiusVector\" can't be null");
         }
-        this.coordinates = coordinates;
+        this.radiusVector = radiusVector;
     }
 
     public double getWeight() {
@@ -66,7 +66,7 @@ public abstract class SpaceObject {
         if (spaceObject == null) {
             throw new IllegalArgumentException("\"other\" can't be null");
         }
-        return coordinates.distance(spaceObject.coordinates);
+        return spaceObject.getRadiusVector().sub(radiusVector).getLength();
     }
 
     public boolean isOverlapped(SpaceObject spaceObject) {
