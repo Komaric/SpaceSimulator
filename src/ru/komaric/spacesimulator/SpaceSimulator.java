@@ -11,7 +11,7 @@ public class SpaceSimulator {
     private static final double G = 6.67e-11;
 
     //period в секундах
-    private long period;
+    private double period;
     private double fadeFactor;
     private SpaceSimulatorListener listener;
     private Thread thread;
@@ -19,7 +19,7 @@ public class SpaceSimulator {
 
     private final LinkedList<QueueItem> queue = new LinkedList<>();
 
-    public SpaceSimulator(SpaceSimulatorListener listener, long period) {
+    public SpaceSimulator(SpaceSimulatorListener listener, double period) {
         if (listener == null) {
             throw new IllegalArgumentException("\"listener\" can't be null");
         }
@@ -28,7 +28,7 @@ public class SpaceSimulator {
         this.fadeFactor = 1;
     }
 
-    public SpaceSimulator(SpaceSimulatorListener listener, long period, Map<String, SpaceObject> spaceObjects) {
+    public SpaceSimulator(SpaceSimulatorListener listener, double period, Map<String, SpaceObject> spaceObjects) {
         this(listener, period);
         if (spaceObjects == null) {
             throw new IllegalArgumentException("\"spaceObjects\" can't be null");
@@ -72,11 +72,11 @@ public class SpaceSimulator {
         }
     }
 
-    public long getPeriod() {
+    public double getPeriod() {
         return period;
     }
 
-    public void setPeriod(long period) {
+    public void setPeriod(double period) {
         if (period <= 0) {
             throw new IllegalArgumentException("\"period\" must be positive");
         }
@@ -137,7 +137,7 @@ public class SpaceSimulator {
             //проверка на нулевой указатель нужна в том случае, если stop() будет вызван в этом жепотоке,
             //а именно в листенере
             while (thread != null && !Thread.interrupted()) {
-                long period;
+                double period;
                 double fadeFactor;
                 HashMap<String, SpaceObject> oldMap = new HashMap<>(spaceObjects.size());
                 HashMap<String, SpaceObject> updatedMap = new HashMap<>(spaceObjects.size());
