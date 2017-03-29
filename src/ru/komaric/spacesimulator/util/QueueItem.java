@@ -18,8 +18,8 @@ public class QueueItem {
         this.type = type;
     }
 
-    public static QueueItem Add(String name, SpaceObject spaceObject) {
-        return new QueueItem(name, spaceObject, QueueItemType.Add);
+    public static QueueItem Add(SpaceObject spaceObject) {
+        return new QueueItem(spaceObject.getName(), spaceObject, QueueItemType.Add);
     }
 
     public static QueueItem Remove(String name) {

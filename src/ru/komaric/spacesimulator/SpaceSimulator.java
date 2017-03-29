@@ -5,6 +5,7 @@ import ru.komaric.spacesimulator.util.QueueItem;
 import ru.komaric.spacesimulator.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpaceSimulator {
 
@@ -15,47 +16,32 @@ public class SpaceSimulator {
     private double fadeFactor;
     private SpaceSimulatorListener listener;
     private Thread thread;
-    private HashMap<String, SpaceObject> spaceObjects = new HashMap<>();
+    private HashMap<String, SpaceObject> spaceObjects;
 
     private final LinkedList<QueueItem> queue = new LinkedList<>();
 
-    public SpaceSimulator(SpaceSimulatorListener listener, double period) {
+    public SpaceSimulator(SpaceSimulatorListener listener, double period, double fadeFactor) {
         if (listener == null) {
             throw new IllegalArgumentException("\"listener\" can't be null");
         }
         this.listener = listener;
         this.period = period;
-        this.fadeFactor = 1;
+        this.fadeFactor = fadeFactor;
+        this.spaceObjects = new HashMap<>();
     }
 
-    public SpaceSimulator(SpaceSimulatorListener listener, double period, Map<String, SpaceObject> spaceObjects) {
-        this(listener, period);
-        if (spaceObjects == null) {
-            throw new IllegalArgumentException("\"spaceObjects\" can't be null");
-        }
-        //Копируем, чтобы случайно их не изменить вовне
-        spaceObjects.forEach((name, object) -> {
-            if (object == null) {
-                throw new IllegalArgumentException("\"spaceObjects\" can't contain null");
-            }
-            this.spaceObjects.put(name, object.copy());
-        });
+    public SpaceSimulator(SpaceSimulatorListener listener, double period) {
+        this(listener, period, 1);
     }
 
     //если поток пересчёта запущен, то сохраненяем добавленные или удалённые объекты в очередь
-    public void addSpaceObject(String name, SpaceObject spaceObject) {
-        if (name == null) {
-            throw new IllegalArgumentException("\"name\" can't be null");
-        }
-        if (spaceObject == null) {
-            throw new IllegalArgumentException("\"spaceObject\" can't be null");
-        }
+    public void addSpaceObject(SpaceObject spaceObject) {
         if (thread == null) {
             synchronized (this) {
-                spaceObjects.put(name, spaceObject.copy());
+                spaceObjects.put(spaceObject.getName(), spaceObject.copy());
             }
         } else {
-            queue.addLast(QueueItem.Add(name, spaceObject.copy()));
+            queue.addLast(QueueItem.Add(spaceObject.copy()));
         }
     }
 
@@ -70,6 +56,13 @@ public class SpaceSimulator {
         } else {
             queue.addLast(QueueItem.Remove(name));
         }
+    }
+
+    public void removeSpaceObject(SpaceObject spaceObject) {
+        if (spaceObject == null) {
+            throw new IllegalArgumentException("\"spaceObject\" can't be null");
+        }
+        removeSpaceObject(spaceObject.getName());
     }
 
     public double getPeriod() {
@@ -134,7 +127,7 @@ public class SpaceSimulator {
     private Runnable iterationTask = new Runnable() {
         @Override
         public void run() {
-            //проверка на нулевой указатель нужна в том случае, если stop() будет вызван в этом жепотоке,
+            //проверка на нулевой указатель нужна в том случае, если stop() будет вызван в этом же потоке,
             //а именно в листенере
             while (thread != null && !Thread.interrupted()) {
                 double period;
@@ -249,8 +242,11 @@ public class SpaceSimulator {
                     }
                 }
 
-                HashMap<String, SpaceObject> copy = new HashMap<>(updatedMap.size());
-                updatedMap.forEach((name, object) -> copy.put(name, object.copy()));
+                Set<SpaceObject> copy = updatedMap.entrySet()
+                        .stream()
+                        .map(Map.Entry::getValue)
+                        .map(SpaceObject::copy)
+                        .collect(Collectors.toSet());
                 synchronized (SpaceSimulator.this) {
                     spaceObjects = updatedMap;
                 }

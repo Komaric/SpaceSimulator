@@ -2,8 +2,8 @@ package ru.komaric.spacesimulator;
 
 import ru.komaric.spacesimulator.spaceobjects.SpaceObject;
 
-import java.util.HashMap;
+import java.util.Set;
 
 public interface SpaceSimulatorListener {
-    void onIteration(HashMap<String, SpaceObject> spaceObjects);
+    void onIteration(Set<SpaceObject> spaceObjects);
 }
