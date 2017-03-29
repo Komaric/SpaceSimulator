@@ -6,8 +6,8 @@ public class Spaceship extends MovableSpaceObject {
 
     private Vector acceleration;
 
-    public Spaceship(String name, Vector radiusVector, double weight, double radius, Vector speed, Vector acceleration) {
-        super(name, radiusVector, weight, radius, speed);
+    public Spaceship(String name, Vector radiusVector, double weight, Vector speed, Vector acceleration) {
+        super(name, radiusVector, weight, 0, speed);
         if (acceleration == null) {
             throw new IllegalArgumentException("\"acceleration\" can't be null");
         }
@@ -16,7 +16,7 @@ public class Spaceship extends MovableSpaceObject {
 
     @Override
     public SpaceObject copy() {
-        return new Spaceship(name, radiusVector, weight, radius, speed, acceleration);
+        return new Spaceship(name, radiusVector, weight, speed, acceleration);
     }
 
     public Vector getAcceleration() {

@@ -71,9 +71,12 @@ public class Vector {
     }
 
     public Vector multiply(double k) {
-        return k == 0
-                ? Zero
-                : new Vector(x, y, k * length);
+        if (k == 0) {
+            return Zero;
+        }
+        return k > 0
+                ? new Vector(x, y , k * length)
+                : new Vector(-x, -y, -k * length);
     }
 
     public Vector divide(double k) {
@@ -92,5 +95,10 @@ public class Vector {
             throw new IllegalArgumentException("\"vector\" can't be null");
         }
         return this.dotProduct(vector) / this.length / vector.length;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%f, %f)", x * length, y * length);
     }
 }
