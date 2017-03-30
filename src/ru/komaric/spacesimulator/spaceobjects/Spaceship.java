@@ -15,6 +15,11 @@ public class Spaceship extends MovableSpaceObject {
     }
 
     @Override
+    public void setRadius(double radius) {
+        throw new RuntimeException("Spaceship always has zero weight");
+    }
+
+    @Override
     public SpaceObject copy() {
         return new Spaceship(name, radiusVector, weight, speed, acceleration);
     }
@@ -24,6 +29,9 @@ public class Spaceship extends MovableSpaceObject {
     }
 
     public void setAcceleration(Vector acceleration) {
+        if (acceleration == null) {
+            throw new IllegalArgumentException("\"acceleration\" can't be null");
+        }
         this.acceleration = acceleration;
     }
 }

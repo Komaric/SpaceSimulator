@@ -16,6 +16,12 @@ public abstract class SpaceObject {
         if (radiusVector == null) {
             throw new IllegalArgumentException("\"radiusVector\" can't be null");
         }
+        if (weight <= 0) {
+            throw new IllegalArgumentException("\"weight\" must be positive");
+        }
+        if (radius < 0) {
+            throw new IllegalArgumentException("\"radius\" must be non-negative");
+        }
         this.name = name;
         this.radiusVector = radiusVector;
         this.weight = weight;
@@ -51,6 +57,9 @@ public abstract class SpaceObject {
     }
 
     public void setWeight(double weight) {
+        if (weight <= 0) {
+            throw new IllegalArgumentException("\"weight\" must be positive");
+        }
         this.weight = weight;
     }
 
@@ -59,19 +68,22 @@ public abstract class SpaceObject {
     }
 
     public void setRadius(double radius) {
+        if (radius < 0) {
+            throw new IllegalArgumentException("\"radius\" must be non-negative");
+        }
         this.radius = radius;
     }
 
     public double distance(SpaceObject spaceObject) {
         if (spaceObject == null) {
-            throw new IllegalArgumentException("\"other\" can't be null");
+            throw new IllegalArgumentException("\"spaceObject\" can't be null");
         }
         return spaceObject.getRadiusVector().sub(radiusVector).getLength();
     }
 
     public boolean isOverlapped(SpaceObject spaceObject) {
         if (spaceObject == null) {
-            throw new IllegalArgumentException("\"other\" can't be null");
+            throw new IllegalArgumentException("\"spaceObject\" can't be null");
         }
         return (this.radius + spaceObject.radius) > this.distance(spaceObject);
     }

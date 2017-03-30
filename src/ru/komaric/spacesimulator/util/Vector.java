@@ -1,5 +1,8 @@
 package ru.komaric.spacesimulator.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 // Сам вектор хранится нормализованным, а его длина отдельно,
 // чтобы поменьше терять точность
 public class Vector {
@@ -99,6 +102,20 @@ public class Vector {
 
     @Override
     public String toString() {
-        return String.format("(%f, %f)", x * length, y * length);
+        return String.format("(%s, %s)", Double.toString(x * length), Double.toString(y * length));
+    }
+
+    public static Vector fromString(String string) {
+        if (string == null) {
+            throw new IllegalArgumentException("\"string\" can't be null");
+        }
+        String d = "[-+]?(\\d*\\.?\\d+|\\d+\\.)([eE][-+]?\\d+)?";
+        Matcher matcher = Pattern.compile(String.format("^ *\\( *(%s) *, *(%s) *\\) *$", d, d)).matcher(string);
+        if (!matcher.matches()) {
+            throw new NumberFormatException();
+        }
+        double x = Double.valueOf(matcher.group(1));
+        double y = Double.valueOf(matcher.group(4));
+        return new Vector(x, y);
     }
 }

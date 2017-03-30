@@ -173,15 +173,18 @@ public class SpaceSimulator {
                         mSpaceObject.setRadiusVector(radiusVector);
                     }
                     if (spaceObject instanceof Fadable) {
-                        float fadeSpeed = 0;
+                        double fadeSpeed = 0;
                         for (SpaceObject so : oldMap.values()) {
                             if (so instanceof Star) {
                                 double distance = oldSpaceObject.distance(so);
                                 fadeSpeed += fadeFactor / distance / distance;
                             }
                         }
-                        double radius = Math.max(0, oldSpaceObject.getRadius() - fadeSpeed * period);
+                        double oldRadius = oldSpaceObject.getRadius();
+                        double radius = Math.max(0, oldRadius - fadeSpeed * period);
                         spaceObject.setRadius(radius);
+                        double weight = (radius / oldRadius) * (radius / oldRadius) * oldSpaceObject.getWeight();
+                        spaceObject.setWeight(weight);
                     }
                     if (spaceObject instanceof Destroyable && ((Destroyable) spaceObject).isDestroyed()) {
                         continue;
