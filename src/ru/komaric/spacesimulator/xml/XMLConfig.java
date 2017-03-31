@@ -19,7 +19,6 @@ public class XMLConfig {
     private static final String COMET_ALIAS = "comet";
     private static final String PLANET_ALIAS = "planet";
     private static final String SPACESHIP_ALIAS = "spaceship";
-    private static final String SPACE_OBJECT_SET_ALIAS = "space-objects";
     private static final String SPACE_SIMULATOR_ALIAS = "space-simulator";
 
     public static void save(SpaceSimulator spaceSimulator, OutputStream out) {

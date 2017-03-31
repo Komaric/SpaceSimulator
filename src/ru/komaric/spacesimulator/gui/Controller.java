@@ -15,10 +15,7 @@ import ru.komaric.spacesimulator.spaceobjects.SpaceObject;
 import ru.komaric.spacesimulator.xml.XMLConfig;
 import ru.komaric.spacesimulator.xml.XMLFormatException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.Set;
 
 public class Controller implements SpaceSimulatorListener {
@@ -131,9 +128,10 @@ public class Controller implements SpaceSimulatorListener {
                 try {
                     FileOutputStream out = new FileOutputStream(file);
                     XMLConfig.save(this.spaceSimulator, out);
-                } catch (FileNotFoundException ex) {
+                    out.close();
+                } catch (IOException ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setContentText("File not found");
+                    alert.setContentText("Error");
                     alert.showAndWait();
                 }
             }
@@ -148,10 +146,11 @@ public class Controller implements SpaceSimulatorListener {
                 try {
                     FileInputStream in = new FileInputStream(file);
                     SpaceSimulator spaceSimulator = XMLConfig.load(in);
+                    in.close();
                     setSpaceSimulator(spaceSimulator);
-                } catch (FileNotFoundException ex) {
+                } catch (IOException ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setContentText("File not found");
+                    alert.setContentText("Error");
                     alert.showAndWait();
                 } catch (XMLFormatException ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -168,6 +167,9 @@ public class Controller implements SpaceSimulatorListener {
 
     public void setSpaceSimulator(SpaceSimulator spaceSimulator) {
         if (this.spaceSimulator != null) {
+            if (this.spaceSimulator.isRunning()) {
+                this.spaceSimulator.stop();
+            }
             this.spaceSimulator.removeListener(this);
         }
         this.spaceSimulator = spaceSimulator;

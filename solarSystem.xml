@@ -1,0 +1,18 @@
+<space-simulator>
+  <period>1000</period>
+  <fade-factor>1.0</fade-factor>
+  <pause>10</pause>
+  <space-objects>
+    <star name="Sun">
+      <weight>1.9885e30</weight>
+      <radius>6.9551e8</radius>
+      <position>(0.0, 0.0)</position>
+    </star>
+    <planet name="Earth">
+      <weight>5.9726e24</weight>
+      <radius>6371.0e3</radius>
+      <position>(1.496e11, 0.0)</position>
+      <speed>(0.0, 29782.7778)</speed>
+    </planet>
+  </space-objects>
+</space-simulator>
