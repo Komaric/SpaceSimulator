@@ -1,13 +1,12 @@
 package ru.komaric.spacesimulator.gui;
 
 import javafx.animation.AnimationTimer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ru.komaric.spacesimulator.SpaceSimulator;
@@ -23,6 +22,8 @@ import java.io.FileOutputStream;
 import java.util.Set;
 
 public class Controller implements SpaceSimulatorListener {
+
+    private final long SLIDER_SPEED_MAX_VALUE = 100;
 
     @FXML
     private SpaceSimulatorPane spaceSimulatorPane;
@@ -44,6 +45,16 @@ public class Controller implements SpaceSimulatorListener {
     private TextField textCenterX;
     @FXML
     private TextField textCenterY;
+    @FXML
+    private Button btnPeriod;
+    @FXML
+    private TextField textPeriod;
+    @FXML
+    private Button btnFadeFactor;
+    @FXML
+    private TextField textFadeFactor;
+    @FXML
+    private VBox vBoxOptions;
 
     private Set<SpaceObject> spaceObjects = null;
     private SpaceSimulator spaceSimulator = null;
@@ -69,6 +80,7 @@ public class Controller implements SpaceSimulatorListener {
             throw new IllegalArgumentException("\"stage\" can't be null");
         }
         this.stage = stage;
+        sliderSpeed.setMax(SLIDER_SPEED_MAX_VALUE);
 
         btnStart.setOnAction(e -> {
             if (!spaceSimulator.isRunning()) {
@@ -86,20 +98,29 @@ public class Controller implements SpaceSimulatorListener {
                 double y = -Double.valueOf(textCenterY.getText());
                 spaceSimulatorPane.setCenter(x, y);
                 spaceSimulatorPane.repaint(spaceObjects);
-            } catch (NumberFormatException ex) { }
-        });
-        sliderScale.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                spaceSimulatorPane.setScale(newValue.doubleValue());
+            } catch (NumberFormatException ex) {
             }
         });
-        sliderSpeed.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                spaceSimulator.setPeriod(newValue.doubleValue());
+        btnPeriod.setOnAction(e -> {
+            try {
+                double period = Double.valueOf(textPeriod.getText());
+                spaceSimulator.setPeriod(period);
+            } catch (NumberFormatException ex) {
             }
         });
+        btnFadeFactor.setOnAction(e -> {
+            try {
+                double fadeFactor = Double.valueOf(textFadeFactor.getText());
+                spaceSimulator.setPeriod(fadeFactor);
+            } catch (NumberFormatException ex) {
+            }
+        });
+        sliderSpeed.valueProperty().addListener((observable, oldValue, newValue) ->
+                spaceSimulator.setPauseBetweenIterations(SLIDER_SPEED_MAX_VALUE - newValue.longValue())
+        );
+        sliderScale.valueProperty().addListener((observable, oldValue, newValue) ->
+                spaceSimulatorPane.setScale(newValue.doubleValue())
+        );
         btnSave.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save configuration");
@@ -121,7 +142,7 @@ public class Controller implements SpaceSimulatorListener {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open configuration");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ALL", "*"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ALL", "*.*"));
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 try {
@@ -154,10 +175,14 @@ public class Controller implements SpaceSimulatorListener {
             spaceObjects = spaceSimulator.getSpaceObjects();
             spaceSimulator.addListener(this);
             btnSave.setDisable(false);
-            sliderSpeed.setValue(spaceSimulator.getPeriod());
+            vBoxOptions.setDisable(false);
+            sliderSpeed.setValue(SLIDER_SPEED_MAX_VALUE - spaceSimulator.getPauseBetweenIterations());
+            textPeriod.setText(Double.toString(spaceSimulator.getPeriod()));
+            textFadeFactor.setText(Double.toString(spaceSimulator.getFadeFactor()));
         } else {
             spaceObjects = null;
             btnSave.setDisable(true);
+            vBoxOptions.setDisable(true);
         }
     }
 

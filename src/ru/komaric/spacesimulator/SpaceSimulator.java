@@ -31,10 +31,6 @@ public class SpaceSimulator {
         this.spaceObjects = new HashMap<>();
     }
 
-    public SpaceSimulator(double period) {
-        this( period, 1);
-    }
-
     public void addListener(SpaceSimulatorListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("\"listener\" can't be null");
