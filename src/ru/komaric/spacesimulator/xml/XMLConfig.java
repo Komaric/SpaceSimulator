@@ -10,6 +10,12 @@ import java.util.Collection;
 
 public class XMLConfig {
 
+    private static final String STAR_ALIAS = "star";
+    private static final String COMET_ALIAS = "comet";
+    private static final String PLANET_ALIAS = "planet";
+    private static final String SPACESHIP_ALIAS = "spaceship";
+    private static final String SPACE_OBJECT_ARRAY_ALIAS = "space-objects";
+
     public static void save(SpaceObject[] spaceObjects, OutputStream out) {
         if (spaceObjects == null) {
             throw new IllegalArgumentException("\"spaceObjects\" can't be null");
@@ -50,11 +56,11 @@ public class XMLConfig {
 
     private static XStream createXStream() {
         XStream xs = new XStream();
-        xs.alias("star", Star.class);
-        xs.alias("comet", Comet.class);
-        xs.alias("planet", Planet.class);
-        xs.alias("spaceship", Spaceship.class);
-        xs.alias("space-objects", SpaceObject[].class);
+        xs.alias(STAR_ALIAS, Star.class);
+        xs.alias(COMET_ALIAS, Comet.class);
+        xs.alias(PLANET_ALIAS , Planet.class);
+        xs.alias(SPACESHIP_ALIAS, Spaceship.class);
+        xs.alias(SPACE_OBJECT_ARRAY_ALIAS, SpaceObject[].class);
         xs.registerConverter(new SpaceObjectConverter());
         return xs;
     }

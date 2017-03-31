@@ -9,35 +9,43 @@ import ru.komaric.spacesimulator.spaceobjects.*;
 import ru.komaric.spacesimulator.util.Vector;
 
 class SpaceObjectConverter implements Converter {
+
+    private static final String NAME = "name";
+    private static final String WEIGHT = "weight";
+    private static final String RADIUS = "radius";
+    private static final String POSITION = "position";
+    private static final String SPEED = "speed";
+    private static final String ACCELERATION = "acceleration";
+
     @Override
     public void marshal(Object o, HierarchicalStreamWriter writer, MarshallingContext context) {
         SpaceObject spaceObject = (SpaceObject)o;
 
-        writer.addAttribute("name", spaceObject.getName());
+        writer.addAttribute(NAME, spaceObject.getName());
 
-        writer.startNode("weight");
+        writer.startNode(WEIGHT);
         writer.setValue(Double.toString(spaceObject.getWeight()));
         writer.endNode();
 
-        writer.startNode("radius");
+        writer.startNode(RADIUS);
         writer.setValue(Double.toString(spaceObject.getRadius()));
         writer.endNode();
 
-        writer.startNode("position");
+        writer.startNode(POSITION);
         writer.setValue(spaceObject.getRadiusVector().toString());
         writer.endNode();
 
         if (spaceObject instanceof MovableSpaceObject) {
             MovableSpaceObject mSpaceObject = (MovableSpaceObject) spaceObject;
 
-            writer.startNode("speed");
+            writer.startNode(SPEED);
             writer.setValue(mSpaceObject.getSpeed().toString());
             writer.endNode();
 
             if (spaceObject instanceof Spaceship) {
                 Spaceship spaceship = (Spaceship) spaceObject;
 
-                writer.startNode("acceleration");
+                writer.startNode(ACCELERATION);
                 writer.setValue(spaceship.getAcceleration().toString());
                 writer.endNode();
             }
@@ -46,7 +54,7 @@ class SpaceObjectConverter implements Converter {
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        String name = reader.getAttribute("name");
+        String name = reader.getAttribute(NAME);
         Double
                 weight = null,
                 radius = null; //Чтобы были nullable
@@ -58,19 +66,19 @@ class SpaceObjectConverter implements Converter {
         while (reader.hasMoreChildren()) {
             reader.moveDown();
             switch (reader.getNodeName()) {
-                case "weight":
+                case WEIGHT:
                     weight = Double.valueOf(reader.getValue());
                     break;
-                case "radius":
+                case RADIUS:
                     radius = Double.valueOf(reader.getValue());
                     break;
-                case "position":
+                case POSITION:
                     radiusVector = Vector.fromString(reader.getValue());
                     break;
-                case "speed":
+                case SPEED:
                     speed = Vector.fromString(reader.getValue());
                     break;
-                case "acceleration":
+                case ACCELERATION:
                     acceleration = Vector.fromString(reader.getValue());
                     break;
             }

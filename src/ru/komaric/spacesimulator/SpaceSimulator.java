@@ -4,8 +4,12 @@ import ru.komaric.spacesimulator.spaceobjects.*;
 import ru.komaric.spacesimulator.util.QueueItem;
 import ru.komaric.spacesimulator.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SpaceSimulator {
 
@@ -14,29 +18,43 @@ public class SpaceSimulator {
     //period в секундах
     private double period;
     private double fadeFactor;
-    private SpaceSimulatorListener listener;
     private Thread thread;
     private HashMap<String, SpaceObject> spaceObjects;
+    private final ArrayList<SpaceSimulatorListener> listeners = new ArrayList<>();
+
+    //На скорость работы очень сильно влияет количество объектов,
+    //поэтому при необходимости будем добавлять оверхед, что бы это небыло особо заметно
+    private long pauseBetweenIterations = 0;
 
     private final LinkedList<QueueItem> queue = new LinkedList<>();
 
-    public SpaceSimulator(SpaceSimulatorListener listener, double period, double fadeFactor) {
-        if (listener == null) {
-            throw new IllegalArgumentException("\"listener\" can't be null");
-        }
-        this.listener = listener;
+    public SpaceSimulator(double period, double fadeFactor) {
         this.period = period;
         this.fadeFactor = fadeFactor;
         this.spaceObjects = new HashMap<>();
     }
 
-    public SpaceSimulator(SpaceSimulatorListener listener, double period) {
-        this(listener, period, 1);
+    public SpaceSimulator(double period) {
+        this( period, 1);
+    }
+
+    public void addListener(SpaceSimulatorListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("\"listener\" can't be null");
+        }
+        listeners.add(listener);
+    }
+
+    public void removeListener(SpaceSimulatorListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("\"listener\" can't be null");
+        }
+        listeners.remove(listener);
     }
 
     //если поток пересчёта запущен, то сохраненяем добавленные или удалённые объекты в очередь
     public void addSpaceObject(SpaceObject spaceObject) {
-        if (thread == null) {
+        if (!isRunning()) {
             synchronized (this) {
                 spaceObjects.put(spaceObject.getName(), spaceObject.copy());
             }
@@ -49,7 +67,7 @@ public class SpaceSimulator {
         if (name == null) {
             throw new IllegalArgumentException("\"name\" can't be null");
         }
-        if (thread == null) {
+        if (!isRunning()) {
             synchronized (this) {
                 spaceObjects.remove(name);
             }
@@ -88,7 +106,7 @@ public class SpaceSimulator {
     }
 
     public void start() {
-        if (thread != null) {
+        if (isRunning()) {
             throw new IllegalThreadStateException("Thread already started");
         }
         thread = new Thread(iterationTask);
@@ -96,17 +114,19 @@ public class SpaceSimulator {
     }
 
     public void stop() {
-        if (thread == null) {
+        if (!isRunning()) {
             throw new IllegalThreadStateException("Thread already stopped");
         }
         thread.interrupt();
         try {
             thread.join();
-        } catch (InterruptedException e) {
-
-        }
+        } catch (InterruptedException e) { }
         thread = null;
         executeQueue(spaceObjects);
+    }
+
+    public boolean isRunning() {
+        return thread != null;
     }
 
     private void executeQueue(HashMap<String, SpaceObject> spaceObjects) {
@@ -124,21 +144,24 @@ public class SpaceSimulator {
         }
     }
 
+    public void setPauseBetweenIterations(long millis) {
+        if (millis < 0) {
+            throw new IllegalArgumentException("\"millis\" must be non-negative");
+        }
+        this.pauseBetweenIterations = millis;
+    }
+
     private Runnable iterationTask = new Runnable() {
         @Override
         public void run() {
             //проверка на нулевой указатель нужна в том случае, если stop() будет вызван в этом же потоке,
             //а именно в листенере
             while (thread != null && !Thread.interrupted()) {
-                double period;
-                double fadeFactor;
-                HashMap<String, SpaceObject> oldMap = new HashMap<>(spaceObjects.size());
+                double period = SpaceSimulator.this.period;
+                double fadeFactor = SpaceSimulator.this.fadeFactor;
+                HashMap<String, SpaceObject> oldMap = spaceObjects;
                 HashMap<String, SpaceObject> updatedMap = new HashMap<>(spaceObjects.size());
-                //Сразу делаем копию, чтобы не блокировать основой поток на протяжении всего пересчёта
-                synchronized (SpaceSimulator.this) {
-                    period = SpaceSimulator.this.period;
-                    fadeFactor = SpaceSimulator.this.fadeFactor;
-                    spaceObjects.forEach((name, object) -> oldMap.put(name, object.copy()));
+                synchronized (queue) {
                     executeQueue(oldMap);
                 }
                 for (HashMap.Entry<String, SpaceObject> entry : oldMap.entrySet()) {
@@ -244,16 +267,21 @@ public class SpaceSimulator {
                         }
                     }
                 }
-
-                Set<SpaceObject> copy = updatedMap.entrySet()
-                        .stream()
-                        .map(Map.Entry::getValue)
-                        .map(SpaceObject::copy)
-                        .collect(Collectors.toSet());
                 synchronized (SpaceSimulator.this) {
                     spaceObjects = updatedMap;
                 }
-                listener.onIteration(copy);
+                //Для каждого листенера создаём свою копию;
+                Stream<SpaceObject> stream = updatedMap.entrySet()
+                        .stream()
+                        .map(Map.Entry::getValue);
+                listeners.forEach((listener -> listener.onIteration(stream
+                        .map(SpaceObject::copy)
+                        .collect(Collectors.toSet()))));
+                try {
+                    Thread.sleep(pauseBetweenIterations);
+                } catch (InterruptedException e) {
+                    return;
+                }
             }
         }
     };

@@ -16,8 +16,8 @@ public abstract class SpaceObject {
         if (radiusVector == null) {
             throw new IllegalArgumentException("\"radiusVector\" can't be null");
         }
-        if (weight <= 0) {
-            throw new IllegalArgumentException("\"weight\" must be positive");
+        if (weight < 0) {
+            throw new IllegalArgumentException("\"weight\" must be non-negative");
         }
         if (radius < 0) {
             throw new IllegalArgumentException("\"radius\" must be non-negative");
@@ -57,8 +57,8 @@ public abstract class SpaceObject {
     }
 
     public void setWeight(double weight) {
-        if (weight <= 0) {
-            throw new IllegalArgumentException("\"weight\" must be positive");
+        if (weight < 0) {
+            throw new IllegalArgumentException("\"weight\" must be non-negative");
         }
         this.weight = weight;
     }

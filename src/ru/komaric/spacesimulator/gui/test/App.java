@@ -30,8 +30,8 @@ public class App extends JFrame implements SpaceSimulatorListener {
         add(button);
         button.addActionListener((l) -> {
             SpaceObject star = new Star("Star", Vector.Zero, 10000, 70);
-            SpaceObject planet = new Planet("Earth", new Vector(200, 0), 100, 30, new Vector(0, -0.00005));
-            SpaceObject planet0 = new Planet("pl", new Vector(-400, 0), 100, 20, new Vector(0, 0.000035));
+            SpaceObject planet = new Planet("Earth", new Vector(200, 0), 100, 30, new Vector(0, 0.00005));
+            SpaceObject planet0 = new Planet("pl", new Vector(-400, 0), 100, 20, new Vector(0, -0.000035));
             spaceSimulator.addSpaceObject(star);
             spaceSimulator.addSpaceObject(planet);
             spaceSimulator.addSpaceObject(planet0);
@@ -44,7 +44,8 @@ public class App extends JFrame implements SpaceSimulatorListener {
 
 
 
-        spaceSimulator = new SpaceSimulator(this, 10);
+        spaceSimulator = new SpaceSimulator(10);
+        spaceSimulator.addListener(this);
         spaceSimulator.setFadeFactor(0.01);
         spaceSimulator.start();
         setLocationRelativeTo(null);
