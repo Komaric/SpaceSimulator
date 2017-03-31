@@ -39,7 +39,7 @@
                             <children>
                                 <Button fx:id="btnStart" mnemonicParsing="false" text="Start"/>
                                 <Button fx:id="btnStop" mnemonicParsing="false" text="Stop" GridPane.columnIndex="1"/>
-                                <Button fx:id="btnSave" mnemonicParsing="false" text="Save" GridPane.rowIndex="1"/>
+                                <Button fx:id="btnSave" disable="true" mnemonicParsing="false" text="Save" GridPane.rowIndex="1"/>
                                 <Button fx:id="btnLoad" mnemonicParsing="false" text="Load" GridPane.columnIndex="1"
                                         GridPane.rowIndex="1"/>
                             </children>

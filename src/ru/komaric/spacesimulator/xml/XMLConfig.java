@@ -2,6 +2,8 @@ package ru.komaric.spacesimulator.xml;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.io.StreamException;
+import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 import ru.komaric.spacesimulator.SpaceSimulator;
 import ru.komaric.spacesimulator.spaceobjects.Comet;
 import ru.komaric.spacesimulator.spaceobjects.Planet;
@@ -39,7 +41,11 @@ public class XMLConfig {
         try {
             Object object = xs.fromXML(in);
             return (SpaceSimulator)object;
-        } catch (ClassCastException | XMLFormatException | ConversionException e) {
+        } catch (ClassCastException
+                | XMLFormatException
+                | StreamException
+                | ConversionException
+                | CannotResolveClassException e) { //получено методом научного тыка
             throw new XMLFormatException();
         }
     }

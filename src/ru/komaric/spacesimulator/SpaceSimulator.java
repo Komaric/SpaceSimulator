@@ -123,6 +123,7 @@ public class SpaceSimulator {
             throw new IllegalThreadStateException("Thread already started");
         }
         thread = new Thread(iterationTask);
+        thread.setDaemon(true);
         thread.start();
     }
 

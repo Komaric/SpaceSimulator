@@ -4,20 +4,25 @@ import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import ru.komaric.spacesimulator.SpaceSimulator;
 import ru.komaric.spacesimulator.SpaceSimulatorListener;
-import ru.komaric.spacesimulator.spaceobjects.Planet;
 import ru.komaric.spacesimulator.spaceobjects.SpaceObject;
-import ru.komaric.spacesimulator.spaceobjects.Star;
-import ru.komaric.spacesimulator.util.Vector;
+import ru.komaric.spacesimulator.xml.XMLConfig;
+import ru.komaric.spacesimulator.xml.XMLFormatException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Set;
 
-class Controller implements SpaceSimulatorListener {
+public class Controller implements SpaceSimulatorListener {
 
     @FXML
     private SpaceSimulatorPane spaceSimulatorPane;
@@ -53,33 +58,27 @@ class Controller implements SpaceSimulatorListener {
                 spaceSimulatorPane.repaint(spaceObjects);
             }
         };
+        animationTimer.start();
     }
 
-    public void initialize(SpaceSimulator spaceSimulator, Stage stage) {
+    public void initialize(Stage stage) {
         if (this.spaceSimulator != null) {
             throw new IllegalStateException("\"spaceSimulator\" is already initialized");
-        }
-        if (spaceSimulator == null) {
-            throw new IllegalArgumentException("\"spaceSimulator\" can't be null");
         }
         if (stage == null) {
             throw new IllegalArgumentException("\"stage\" can't be null");
         }
-        this.spaceSimulator = spaceSimulator;
         this.stage = stage;
-        spaceSimulator.addListener(this);
 
         btnStart.setOnAction(e -> {
             if (!spaceSimulator.isRunning()) {
                 spaceSimulator.start();
             }
-            animationTimer.start();
         });
         btnStop.setOnAction(e -> {
             if (spaceSimulator.isRunning()) {
                 spaceSimulator.stop();
             }
-            animationTimer.stop();
         });
         btnCenter.setOnAction(e -> {
             try {
@@ -102,19 +101,64 @@ class Controller implements SpaceSimulatorListener {
             }
         });
         btnSave.setOnAction(e -> {
-
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save configuration");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
+            fileChooser.setInitialFileName("config.xml");
+            File file = fileChooser.showSaveDialog(stage);
+            if (file != null) {
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    XMLConfig.save(this.spaceSimulator, out);
+                } catch (FileNotFoundException ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("File not found");
+                    alert.showAndWait();
+                }
+            }
         });
         btnLoad.setOnAction(e -> {
-
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open configuration");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ALL", "*"));
+            File file = fileChooser.showOpenDialog(stage);
+            if (file != null) {
+                try {
+                    FileInputStream in = new FileInputStream(file);
+                    SpaceSimulator spaceSimulator = XMLConfig.load(in);
+                    setSpaceSimulator(spaceSimulator);
+                } catch (FileNotFoundException ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("File not found");
+                    alert.showAndWait();
+                } catch (XMLFormatException ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("Bad file");
+                    alert.showAndWait();
+                }
+            }
         });
+    }
 
-        //тест
-        spaceSimulator.setPauseBetweenIterations(10);
-        spaceSimulator.addSpaceObject(new Star("Star", Vector.Zero, 10000, 70));
-        spaceSimulator.addSpaceObject(new Planet("Earth", new Vector(200, 0), 100, 30, new Vector(0, 0.00005)));
-        spaceSimulator.addSpaceObject(new Planet("pl", new Vector(-400, 0), 100, 20, new Vector(0, -0.000035)));
-        animationTimer.start();
-        spaceSimulator.start();
+    public SpaceSimulator getSpaceSimulator() {
+        return spaceSimulator;
+    }
+
+    public void setSpaceSimulator(SpaceSimulator spaceSimulator) {
+        if (this.spaceSimulator != null) {
+            this.spaceSimulator.removeListener(this);
+        }
+        this.spaceSimulator = spaceSimulator;
+        if (spaceSimulator != null) {
+            spaceObjects = spaceSimulator.getSpaceObjects();
+            spaceSimulator.addListener(this);
+            btnSave.setDisable(false);
+            sliderSpeed.setValue(spaceSimulator.getPeriod());
+        } else {
+            spaceObjects = null;
+            btnSave.setDisable(true);
+        }
     }
 
     @Override

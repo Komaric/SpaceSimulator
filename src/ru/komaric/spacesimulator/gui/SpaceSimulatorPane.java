@@ -5,16 +5,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import ru.komaric.spacesimulator.SpaceSimulatorListener;
 import ru.komaric.spacesimulator.spaceobjects.SpaceObject;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
-class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
+public class SpaceSimulatorPane extends Pane {
 
-    private Set<SpaceObject> spaceObjects = new HashSet<>();
     private double scale = 1;
     private final Canvas canvas;
     private Point2D center = new Point2D(0, 0);
@@ -43,11 +39,6 @@ class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
             graphics.fillOval(x, y, radius * 2, radius * 2);
             graphics.fillText(spaceObject.getName(), x + radius  * 2 + 5, y + radius);
         }
-    }
-
-    @Override
-    public void onIteration(Set<SpaceObject> spaceObjects) {
-        this.spaceObjects = spaceObjects;
     }
 
     public Point2D getCenter() {
