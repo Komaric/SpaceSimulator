@@ -98,7 +98,7 @@ class SpaceObjectConverter implements Converter {
                 spaceObject = new Spaceship(name, radiusVector, weight, speed, acceleration);
             }
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new XmlFormatException();
+            throw new XMLFormatException();
         }
 
         return spaceObject;

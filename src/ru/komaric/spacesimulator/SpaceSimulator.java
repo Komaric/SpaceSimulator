@@ -4,10 +4,7 @@ import ru.komaric.spacesimulator.spaceobjects.*;
 import ru.komaric.spacesimulator.util.QueueItem;
 import ru.komaric.spacesimulator.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,6 +71,22 @@ public class SpaceSimulator {
         } else {
             queue.addLast(QueueItem.Remove(name));
         }
+    }
+
+    public Set<SpaceObject> getSpaceObjects() {
+        boolean running = isRunning();
+        if (running) {
+            stop();
+        }
+        Set<SpaceObject> spaceObjects = this.spaceObjects.entrySet()
+                .stream()
+                .map(Map.Entry::getValue)
+                .map(SpaceObject::copy)
+                .collect(Collectors.toSet());
+        if (running) {
+            start();
+        }
+        return spaceObjects;
     }
 
     public void removeSpaceObject(SpaceObject spaceObject) {
@@ -149,6 +162,10 @@ public class SpaceSimulator {
             throw new IllegalArgumentException("\"millis\" must be non-negative");
         }
         this.pauseBetweenIterations = millis;
+    }
+
+    public long getPauseBetweenIterations() {
+        return pauseBetweenIterations;
     }
 
     private Runnable iterationTask = new Runnable() {

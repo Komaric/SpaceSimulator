@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import ru.komaric.spacesimulator.SpaceSimulator;
 import ru.komaric.spacesimulator.SpaceSimulatorListener;
 import ru.komaric.spacesimulator.spaceobjects.Planet;
@@ -41,11 +42,12 @@ public class Controller implements SpaceSimulatorListener {
 
     private Set<SpaceObject> spaceObjects = null;
     private SpaceSimulator spaceSimulator = null;
-    private final AnimationTimer timer;
+    private final AnimationTimer animationTimer;
+    private Stage stage;
 
 
     public Controller() {
-        timer = new AnimationTimer() {
+        animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 spaceSimulatorPane.repaint(spaceObjects);
@@ -53,36 +55,36 @@ public class Controller implements SpaceSimulatorListener {
         };
     }
 
-    public void initialize(SpaceSimulator spaceSimulator) {
+    public void initialize(SpaceSimulator spaceSimulator, Stage stage) {
         if (this.spaceSimulator != null) {
             throw new IllegalStateException("\"spaceSimulator\" is already initialized");
         }
         if (spaceSimulator == null) {
             throw new IllegalArgumentException("\"spaceSimulator\" can't be null");
         }
+        if (stage == null) {
+            throw new IllegalArgumentException("\"stage\" can't be null");
+        }
         this.spaceSimulator = spaceSimulator;
+        this.stage = stage;
         spaceSimulator.addListener(this);
 
-        sliderScale.setValue(50);
-        sliderSpeed.setValue(50);
-
-        //короткие листенеры сразу опишу тут
         btnStart.setOnAction(e -> {
             if (!spaceSimulator.isRunning()) {
                 spaceSimulator.start();
             }
-            startAnimation();
+            animationTimer.start();
         });
         btnStop.setOnAction(e -> {
             if (spaceSimulator.isRunning()) {
                 spaceSimulator.stop();
             }
-            stopAnimation();
+            animationTimer.stop();
         });
         btnCenter.setOnAction(e -> {
             try {
                 double x = Double.valueOf(textCenterX.getText());
-                double y = Double.valueOf(textCenterY.getText());
+                double y = -Double.valueOf(textCenterY.getText());
                 spaceSimulatorPane.setCenter(x, y);
                 spaceSimulatorPane.repaint(spaceObjects);
             } catch (NumberFormatException ex) { }
@@ -99,32 +101,24 @@ public class Controller implements SpaceSimulatorListener {
                 spaceSimulator.setPeriod(newValue.doubleValue());
             }
         });
+        btnSave.setOnAction(e -> {
+
+        });
+        btnLoad.setOnAction(e -> {
+
+        });
 
         //тест
-        spaceSimulator.addSpaceObject(new Star("Star", Vector.Zero, 10000, 70));
         spaceSimulator.setPauseBetweenIterations(10);
+        spaceSimulator.addSpaceObject(new Star("Star", Vector.Zero, 10000, 70));
         spaceSimulator.addSpaceObject(new Planet("Earth", new Vector(200, 0), 100, 30, new Vector(0, 0.00005)));
         spaceSimulator.addSpaceObject(new Planet("pl", new Vector(-400, 0), 100, 20, new Vector(0, -0.000035)));
-        startAnimation();
+        animationTimer.start();
         spaceSimulator.start();
     }
 
     @Override
     public void onIteration(Set<SpaceObject> spaceObjects) {
         this.spaceObjects = spaceObjects;
-    }
-
-    public void startAnimation() {
-        if (spaceSimulator == null) {
-            throw new IllegalStateException("spaceSimulator is not initialized");
-        }
-        timer.start();
-    }
-
-    public void stopAnimation() {
-        if (spaceSimulator == null) {
-            throw new IllegalStateException("spaceSimulator is not initialized");
-        }
-        timer.stop();
     }
 }

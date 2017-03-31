@@ -17,7 +17,7 @@ public class App extends Application {
         AnchorPane root = loader.load();
         Controller controller = loader.getController();
         spaceSimulator = new SpaceSimulator(1000);
-        controller.initialize(spaceSimulator);
+        controller.initialize(spaceSimulator, primaryStage);
 
         primaryStage.setTitle("Space Simulator");
         Scene scene = new Scene(root);
