@@ -17,7 +17,7 @@ import ru.komaric.spacesimulator.util.Vector;
 
 import java.util.Set;
 
-public class Controller implements SpaceSimulatorListener {
+class Controller implements SpaceSimulatorListener {
 
     @FXML
     private SpaceSimulatorPane spaceSimulatorPane;

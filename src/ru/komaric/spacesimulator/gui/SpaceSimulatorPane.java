@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
+class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
 
     private Set<SpaceObject> spaceObjects = new HashSet<>();
     private double scale = 1;

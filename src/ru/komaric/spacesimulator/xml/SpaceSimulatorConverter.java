@@ -11,7 +11,7 @@ import ru.komaric.spacesimulator.spaceobjects.SpaceObject;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SpaceSimulatorConverter implements Converter {
+class SpaceSimulatorConverter implements Converter {
 
     private static final String PERIOD = "period";
     private static final String FADE_FACTOR = "fade-factor";

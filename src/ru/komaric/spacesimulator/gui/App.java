@@ -7,7 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ru.komaric.spacesimulator.SpaceSimulator;
 
-public class App extends Application {
+class App extends Application {
 
     private SpaceSimulator spaceSimulator;
 
