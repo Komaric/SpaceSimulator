@@ -18,7 +18,6 @@ public class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
     private double scale = 1;
     private final Canvas canvas;
     private Point2D center = new Point2D(0, 0);
-    //private final AnimationTimer timer;
 
     public SpaceSimulatorPane() {
         setStyle("-fx-background-color: black;");
@@ -28,12 +27,6 @@ public class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
         heightProperty().addListener((observable, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
         getChildren().add(canvas);
         canvas.getGraphicsContext2D().setFill(Color.WHITE);
-//        timer = new AnimationTimer() {
-//            @Override
-//            public void handle(long now) {
-//                repaint();
-//            }
-//        };
     }
 
     public void repaint(Collection<SpaceObject> spaceObjects) {
@@ -56,14 +49,6 @@ public class SpaceSimulatorPane extends Pane implements SpaceSimulatorListener {
     public void onIteration(Set<SpaceObject> spaceObjects) {
         this.spaceObjects = spaceObjects;
     }
-
-//    public void startAnimation() {
-//        timer.start();
-//    }
-//
-//    public void stopAnimation() {
-//        timer.stop();
-//    }
 
     public Point2D getCenter() {
         return center;
