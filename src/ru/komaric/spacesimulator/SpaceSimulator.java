@@ -3,6 +3,7 @@ package ru.komaric.spacesimulator;
 import ru.komaric.spacesimulator.spaceobjects.*;
 import ru.komaric.spacesimulator.util.QueueItem;
 import ru.komaric.spacesimulator.util.Vector;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -124,13 +125,18 @@ public class SpaceSimulator {
     }
 
     public void stop() {
+        //TODO: что-то с этим сделать
+        if (Thread.currentThread() == thread) {
+            throw new NotImplementedException();
+        }
         if (!isRunning()) {
             throw new IllegalThreadStateException("Thread already stopped");
         }
         thread.interrupt();
         try {
             thread.join();
-        } catch (InterruptedException e) { }
+        } catch (InterruptedException e) {
+        }
         thread = null;
         executeQueue(spaceObjects);
     }
@@ -168,9 +174,7 @@ public class SpaceSimulator {
     private Runnable iterationTask = new Runnable() {
         @Override
         public void run() {
-            //проверка на нулевой указатель нужна в том случае, если stop() будет вызван в этом же потоке,
-            //а именно в листенере
-            while (thread != null && !Thread.interrupted()) {
+            while (!Thread.interrupted()) {
                 double period = SpaceSimulator.this.period;
                 double fadeFactor = SpaceSimulator.this.fadeFactor;
                 HashMap<String, SpaceObject> oldMap = spaceObjects;
@@ -230,29 +234,33 @@ public class SpaceSimulator {
                 }
 
                 //страшная обработка столкновений объектов
+                int length = updatedMap.size();
+                SpaceObject[] arr = updatedMap.values().toArray(new SpaceObject[length]);
                 boolean done = false;
                 while (!done) {
                     done = true;
-                    for (Map.Entry<String, SpaceObject> firstEntry : updatedMap.entrySet()) {
-                        SpaceObject first = firstEntry.getValue();
-                        for (Map.Entry<String, SpaceObject> secondEntry : updatedMap.entrySet()) {
-                            SpaceObject second = secondEntry.getValue();
-                            if (first == second) {
+                    for (int i = 0; i < length; ++i) {
+                        for (int j = 0; j < length; ++j) {
+                            if (i == j) {
                                 continue;
                             }
-                            if (first.isOverlapped(second)) {
+                            if (arr[i].isOverlapped(arr[j])) {
                                 done = false;
                                 SpaceObject updated, removed;
-                                String removedName;
-                                if (first.getWeight() >= second.getWeight()) {
-                                    updated = first;
-                                    removed = second;
-                                    removedName = secondEntry.getKey();
+                                int removedPosition;
+                                if (arr[i].getWeight() >= arr[j].getWeight()) {
+                                    updated = arr[i];
+                                    removed = arr[j];
+                                    removedPosition = j;
                                 } else {
-                                    updated = second;
-                                    removed = first;
-                                    removedName = firstEntry.getKey();
+                                    updated = arr[j];
+                                    removed = arr[i];
+                                    removedPosition = i;
                                 }
+                                arr[removedPosition] = arr[length - 1];
+                                arr[length-1] = removed;
+                                --length;
+                                --j;
                                 double updatedWeight = updated.getWeight();
                                 double removedWeight = removed.getWeight();
                                 if (updated instanceof MovableSpaceObject) {
@@ -272,15 +280,14 @@ public class SpaceSimulator {
                                 }
                                 updated.setWeight(updatedWeight + removedWeight);
                                 updated.setRadius(updated.getRadius() + removed.getRadius());
-                                updatedMap.remove(removedName);
-                                break;
                             }
-                        }
-                        if (!done) {
-                            break;
                         }
                     }
                 }
+                for (int i = length; i < arr.length; ++i) {
+                    updatedMap.remove(arr[i].getName());
+                }
+
                 synchronized (SpaceSimulator.this) {
                     spaceObjects = updatedMap;
                 }
