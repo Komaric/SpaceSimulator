@@ -115,25 +115,29 @@ public class SpaceSimulator {
     }
 
     public void start() {
-        if (isRunning()) {
-            throw new IllegalThreadStateException("Thread already started");
+        synchronized (this) {
+            if (isRunning()) {
+                throw new IllegalThreadStateException("Thread already started");
+            }
+            thread = new Thread(iterationTask);
+            thread.setDaemon(true);
+            thread.start();
         }
-        thread = new Thread(iterationTask);
-        thread.setDaemon(true);
-        thread.start();
     }
 
     public void stop() {
-        if (!isRunning()) {
-            throw new IllegalThreadStateException("Thread already stopped");
+        synchronized (this) {
+            if (!isRunning()) {
+                throw new IllegalThreadStateException("Thread already stopped");
+            }
+            thread.interrupt();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+            }
+            thread = null;
+            executeQueue(spaceObjects);
         }
-        thread.interrupt();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-        }
-        thread = null;
-        executeQueue(spaceObjects);
     }
 
     public boolean isRunning() {
