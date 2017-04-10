@@ -64,8 +64,11 @@
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Speed"/>
                 <Slider fx:id="sliderSpeed" />
             </VBox>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Scale"/>
-            <Slider fx:id="sliderScale" min="0.0000000001" max="0.0000001"/>
+            <HBox spacing="10">
+                <Button fx:id="btnScale" prefWidth="110" mnemonicParsing="false" text="Scale"/>
+                <TextField fx:id="textScale" promptText="Scale" />
+            </HBox>
+            <Slider fx:id="sliderScale" min="-1" max="1" showTickLabels="true"/>
         </VBox>
     </GridPane>
 </AnchorPane>

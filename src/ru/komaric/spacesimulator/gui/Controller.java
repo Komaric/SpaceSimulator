@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import ru.komaric.spacesimulator.SpaceSimulator;
 import ru.komaric.spacesimulator.SpaceSimulatorListener;
 import ru.komaric.spacesimulator.spaceobjects.SpaceObject;
@@ -21,6 +22,7 @@ import java.util.Set;
 public class Controller implements SpaceSimulatorListener {
 
     private final long SLIDER_SPEED_MAX_VALUE = 100;
+    private double scale = 1; //начальное значение
 
     @FXML
     private SpaceSimulatorPane spaceSimulatorPane;
@@ -34,8 +36,6 @@ public class Controller implements SpaceSimulatorListener {
     private Button btnLoad;
     @FXML
     private Button btnCenter;
-    @FXML
-    private Slider sliderScale;
     @FXML
     private Slider sliderSpeed;
     @FXML
@@ -52,6 +52,12 @@ public class Controller implements SpaceSimulatorListener {
     private TextField textFadeFactor;
     @FXML
     private VBox vBoxOptions;
+    @FXML
+    private Button btnScale;
+    @FXML
+    private TextField textScale;
+    @FXML
+    private Slider sliderScale;
 
     private Set<SpaceObject> spaceObjects = null;
     private SpaceSimulator spaceSimulator = null;
@@ -78,6 +84,23 @@ public class Controller implements SpaceSimulatorListener {
         }
         this.stage = stage;
         sliderSpeed.setMax(SLIDER_SPEED_MAX_VALUE);
+        textScale.setText(Double.toString(scale));
+        sliderScale.setValue(0);
+        spaceSimulatorPane.setScale(scale);
+        sliderScale.setLabelFormatter(new StringConverter<Double>() {
+            @Override
+            public String toString(Double n) {
+                if (n < 0) {
+                    return "* " + Double.toString(Math.pow(10, sliderScale.getMin()));
+                } else {
+                    return "* " + Double.toString(Math.pow(10, sliderScale.getMax()));
+                }
+            }
+            @Override
+            public Double fromString(String s) {
+                return null;
+            }
+        });
 
         btnStart.setOnAction(e -> {
             if (!spaceSimulator.isRunning()) {
@@ -115,8 +138,16 @@ public class Controller implements SpaceSimulatorListener {
         sliderSpeed.valueProperty().addListener((observable, oldValue, newValue) ->
                 spaceSimulator.setPauseBetweenIterations(SLIDER_SPEED_MAX_VALUE - newValue.longValue())
         );
+        btnScale.setOnAction(e -> {
+            try {
+                scale = Double.valueOf(textScale.getText());
+                sliderScale.setValue(0);
+                spaceSimulatorPane.setScale(scale);
+            } catch (NumberFormatException ex) {
+            }
+        });
         sliderScale.valueProperty().addListener((observable, oldValue, newValue) ->
-                spaceSimulatorPane.setScale(newValue.doubleValue())
+                spaceSimulatorPane.setScale(scale * Math.pow(10, newValue.doubleValue()))
         );
         btnSave.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
