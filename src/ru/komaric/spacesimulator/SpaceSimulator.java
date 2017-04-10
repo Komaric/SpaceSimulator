@@ -3,7 +3,6 @@ package ru.komaric.spacesimulator;
 import ru.komaric.spacesimulator.spaceobjects.*;
 import ru.komaric.spacesimulator.util.QueueItem;
 import ru.komaric.spacesimulator.util.Vector;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,10 +124,6 @@ public class SpaceSimulator {
     }
 
     public void stop() {
-        //TODO: что-то с этим сделать
-        if (Thread.currentThread() == thread) {
-            throw new NotImplementedException();
-        }
         if (!isRunning()) {
             throw new IllegalThreadStateException("Thread already stopped");
         }
@@ -258,7 +253,7 @@ public class SpaceSimulator {
                                     removedPosition = i;
                                 }
                                 arr[removedPosition] = arr[length - 1];
-                                arr[length-1] = removed;
+                                arr[length - 1] = removed;
                                 --length;
                                 --j;
                                 double updatedWeight = updated.getWeight();
@@ -295,10 +290,15 @@ public class SpaceSimulator {
                 Stream<SpaceObject> stream = updatedMap.entrySet()
                         .stream()
                         .map(Map.Entry::getValue);
-                listeners.forEach((listener -> listener.onIteration(stream
-                        .map(SpaceObject::copy)
-                        .collect(Collectors.toSet()))));
+                //запускаем листенеры в новом потоке для того, что бы в них можно было вызвать stop()
+                Thread listenersThread = new Thread(() ->
+                        listeners.forEach((listener -> listener.onIteration(stream
+                                .map(SpaceObject::copy)
+                                .collect(Collectors.toSet()))))
+                );
+                listenersThread.start();
                 try {
+                    listenersThread.join();
                     Thread.sleep(pauseBetweenIterations);
                 } catch (InterruptedException e) {
                     return;

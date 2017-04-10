@@ -96,6 +96,7 @@ public class Controller implements SpaceSimulatorListener {
                     return "* " + Double.toString(Math.pow(10, sliderScale.getMax()));
                 }
             }
+
             @Override
             public Double fromString(String s) {
                 return null;
